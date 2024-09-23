@@ -17,16 +17,22 @@
             {% csrf_token %}
             <div>
                 <label class="block text-sm text-gray-500">Username</label>
-                <input type="text" name="username" class="w-full h-14 p-2 border border-gray-400 rounded-lg shadow-sm focus:ring focus:ring-indigo-300" required>
+                <input type="text" name="username"
+                    class="w-full h-14 p-2 border border-gray-400 rounded-lg shadow-sm focus:ring focus:ring-indigo-300"
+                    required>
             </div>
 
             <div>
                 <label class="block text-sm text-gray-500">Password</label>
-                <input type="password" name="password" class="w-full h-14 p-2 border border-gray-400 rounded-lg shadow-sm focus:ring focus:ring-indigo-300" required>
+                <input type="password" name="password"
+                    class="w-full h-14 p-2 border border-gray-400 rounded-lg shadow-sm focus:ring focus:ring-indigo-300"
+                    placeholder="•••••••••" required>
             </div>
 
             <div class="flex justify-center">
-                <button class="w-full h-14 bg-orange-400 text-white font-medium rounded-lg shadow-lg hover:bg-orange-600">LOG IN</button>
+                <button
+                    class="w-full h-14 bg-orange-400 text-white font-medium rounded-lg shadow-lg hover:bg-orange-600">LOG
+                    IN</button>
             </div>
         </form>
 

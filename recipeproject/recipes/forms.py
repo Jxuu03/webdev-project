@@ -1,7 +1,9 @@
 from django import forms
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.models import User
+from .models import Recipe, Ingredient
 
+## -- UserRegisterForm -- ##
 class UserRegisterForm(UserCreationForm):
     email = forms.EmailField(required=True)
     first_name = forms.CharField(max_length=50, required=True)
@@ -9,7 +11,7 @@ class UserRegisterForm(UserCreationForm):
     
     class Meta:
         model = User
-        fields = ['first_name', 'last_name', 'email', 'username', 'password1', 'password2']
+        fields = ['username', 'first_name', 'last_name', 'email', 'password1', 'password2']
     
     def clean(self):
         cleaned_data = super().clean()
@@ -20,3 +22,14 @@ class UserRegisterForm(UserCreationForm):
             self.add_error('password2', "Passwords do not match")
 
         return cleaned_data
+    
+## -- RecipeForm -- ##
+class RecipeForm(forms.ModelForm):
+    class Meta:
+        model = Recipe
+        fields = '__all__'
+
+class IngredientForm(forms.ModelForm):
+    class Meta:
+        model = Ingredient
+        fields = '__all__'

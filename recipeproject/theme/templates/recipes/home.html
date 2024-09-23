@@ -1,6 +1,156 @@
 {% extends 'recipes/base.html' %}
 
 {% block main %}
-<h1>Welcome to the Recipe App!</h1>
-<p>Here you can find and create your favorite recipes.</p>
+{% load static %}
+
+<div class="flex flex-col items-center justify-center md:h-64 w-3/4 mx-auto" style="margin-top: 160px;">
+    <!-- Carousel container -->
+    <div id="default-carousel" class="relative w-3/4" data-carousel="slide">
+        <!-- Carousel wrapper with custom height for larger size -->
+        <div class="relative h-56 overflow-hidden rounded-lg md:h-[500px]">
+            <!-- Item 1 -->
+            <div class="hidden opacity-0 duration-1000 ease-in-out" data-carousel-item>
+                <img src="{% static 'recipes/img/carousel-1.jpg' %}"
+                    class="absolute block w-full -translate-x-1/2 -translate-y-1/2 top-1/2 left-1/2" alt="Slide 1">
+            </div>
+            <!-- Item 2 -->
+            <div class="hidden opacity-0 duration-1000 ease-in-out" data-carousel-item>
+                <img src="{% static 'recipes/img/carousel-2.jpg' %}"
+                    class="absolute block w-full -translate-x-1/2 -translate-y-1/2 top-1/2 left-1/2" alt="Slide 2">
+            </div>
+            <!-- Item 3 -->
+            <div class="hidden opacity-0 duration-1000 ease-in-out" data-carousel-item>
+                <img src="{% static 'recipes/img/carousel-3.jpg' %}"
+                    class="absolute block w-full -translate-x-1/2 -translate-y-1/2 top-1/2 left-1/2" alt="Slide 3">
+            </div>
+        </div>
+        <!-- Slider indicators -->
+        <div class="absolute z-30 flex -translate-x-1/2 bottom-5 left-1/2 space-x-3 rtl:space-x-reverse">
+            <button type="button" class="w-3 h-3 rounded-full bg-white" data-carousel-slide-to="0"
+                aria-label="Slide 1"></button>
+            <button type="button" class="w-3 h-3 rounded-full bg-white" data-carousel-slide-to="1"
+                aria-label="Slide 2"></button>
+            <button type="button" class="w-3 h-3 rounded-full bg-white" data-carousel-slide-to="2"
+                aria-label="Slide 3"></button>
+        </div>
+        <!-- Slider controls -->
+        <button type="button"
+            class="absolute top-0 left-0 z-30 flex items-center justify-center h-full px-4 cursor-pointer"
+            data-carousel-prev>
+            <span
+                class="inline-flex items-center justify-center w-10 h-10 rounded-full bg-white/30 hover:bg-white/50 focus:ring-4 focus:ring-white">
+                <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
+                </svg>
+            </span>
+        </button>
+        <button type="button"
+            class="absolute top-0 right-0 z-30 flex items-center justify-center h-full px-4 cursor-pointer"
+            data-carousel-next>
+            <span
+                class="inline-flex items-center justify-center w-10 h-10 rounded-full bg-white/30 hover:bg-white/50 focus:ring-4 focus:ring-white">
+                <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+                </svg>
+            </span>
+        </button>
+    </div>
+</div>
+
+<!-- Recipe Sections -->
+<div class="w-3/4 mt-32" style="margin-left: 385px;"> <!-- Adjusted margins to move the recipe sections left -->
+    <!-- Appetizer Section -->
+    <h2 class="text-2xl font-bold mt-8">Appetizers</h2>
+    <div class="flex overflow-x-auto space-x-4 py-4">
+        {% if appetizers %}
+            {% for recipe in appetizers %}
+                {% include 'recipes/components/recipe.html' with recipe=recipe %}
+            {% endfor %}
+        {% else %}
+            <p>No main dish recipes available.</p>
+        {% endif %}
+    </div>
+
+    <!-- Main Dish Section -->
+    <h2 class="text-2xl font-bold mt-8">Main Dishes</h2>
+    <div class="flex overflow-x-auto space-x-4 py-4">
+        {% if main_dishes %}
+            {% for recipe in main_dishes %}
+                {% include 'recipes/components/recipe.html' with recipe=recipe %}
+            {% endfor %}
+        {% else %}
+            <p>No main dish recipes available.</p>
+        {% endif %}
+    </div>
+
+    <!-- Dessert Section -->
+    <h2 class="text-2xl font-bold mt-8">Desserts</h2>
+    <div class="flex overflow-x-auto space-x-4 py-4">
+        {% if desserts %}
+            {% for recipe in desserts %}
+                {% include 'recipes/components/recipe.html' with recipe=recipe %}
+            {% endfor %}
+        {% else %}
+            <p>No dessert recipes available.</p>
+        {% endif %}
+    </div>
+</div>
+
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        let carouselItems = document.querySelectorAll('[data-carousel-item]');
+        let currentIndex = 0;
+
+        function showSlide(index) {
+            carouselItems.forEach((item, i) => {
+                if (i === index) {
+                    item.classList.remove('hidden');
+                    item.classList.remove('opacity-0');
+                    item.classList.add('opacity-100'); // Fade in effect
+                } else {
+                    item.classList.add('hidden');
+                    item.classList.remove('opacity-100');
+                    item.classList.add('opacity-0'); // Fade out effect
+                }
+            });
+
+            // Update indicators
+            document.querySelectorAll('[data-carousel-slide-to]').forEach((indicator, i) => {
+                indicator.setAttribute('aria-current', i === index ? 'true' : 'false');
+                indicator.classList.toggle('bg-orange-500', i === index); // Optional: Change color for the active indicator
+            });
+        }
+
+        // Show the next slide
+        document.querySelector('[data-carousel-next]').addEventListener('click', function () {
+            currentIndex = (currentIndex + 1) % carouselItems.length;
+            showSlide(currentIndex);
+        });
+
+        // Show the previous slide
+        document.querySelector('[data-carousel-prev]').addEventListener('click', function () {
+            currentIndex = (currentIndex - 1 + carouselItems.length) % carouselItems.length;
+            showSlide(currentIndex);
+        });
+
+        // Handle indicators
+        document.querySelectorAll('[data-carousel-slide-to]').forEach((indicator, i) => {
+            indicator.addEventListener('click', function () {
+                currentIndex = i;
+                showSlide(i);
+            });
+        });
+
+        // Initialize the carousel
+        showSlide(currentIndex);
+
+        // Auto-advance the carousel every 5 seconds (5000 milliseconds)
+        setInterval(() => {
+            currentIndex = (currentIndex + 1) % carouselItems.length;
+            showSlide(currentIndex);
+        }, 5000);
+    });
+</script>
+
 {% endblock main %}

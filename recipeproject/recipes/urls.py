@@ -16,12 +16,17 @@ Including another URLconf
 """
 from django.urls import path
 from recipes.views import *
-from . import views
-from django.contrib.auth.views import LoginView, LogoutView
+from django.contrib.auth.views import LogoutView
+from django.conf import settings
+from django.conf.urls.static import static
 
 urlpatterns = [
     path('login/', UserLoginView.as_view(), name='login'),
     path('signup/', SignUpView.as_view(), name='signup'),
     path('logout/', LogoutView.as_view(next_page='login'), name='logout'),
     path('', home, name='home'),
-]
+    path('recipe/<int:pk>/', recipeDetail, name='recipe_detail'),
+    path('recipes/new/', recipeCreate, name='recipe_create'),
+    path('recipes/edit/<int:pk>/', recipeUpdate, name='recipe_update'),
+    path('recipes/delete/<int:pk>/', recipeDelete, name='recipe_delete'),
+] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
