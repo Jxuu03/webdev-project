@@ -44,7 +44,8 @@
                     </div>
                 </form>
                 <a href="{% url 'home' %}" class="text-gray-700 font-medium hover:text-orange-600 transition">สูตรอาหาร</a>
-                <a href="#" class="text-gray-700 font-medium hover:text-orange-600 transition">สูตรของฉัน</a>
+                <a href="{% url 'myRecipes' %}" class="text-gray-700 font-medium hover:text-orange-600 transition">สูตรของฉัน</a>
+
                 <a href="{% url 'signup' %}" class="text-gray-700 font-medium hover:text-orange-600 transition">ลงทะเบียน</a>
                 <a href="{% url 'login' %}" class="text-gray-700 font-medium hover:text-orange-600 transition">เข้าสู่ระบบ</a>
                 <form action="{% url 'logout' %}" method="post">

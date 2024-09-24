@@ -6,7 +6,10 @@ from django.contrib.auth.views import LoginView
 from django.contrib import messages
 from .forms import * 
 from .models import *
-
+from django.contrib.auth.mixins import LoginRequiredMixin
+from django.views.generic import ListView
+from .models import Recipe
+from django.contrib.auth.decorators import login_required
 ## -- Authen -- ##
 class SignUpView(CreateView):
     form_class = UserRegisterForm
@@ -44,15 +47,20 @@ def recipeDetail(request, pk):
 # Create a new recipe
 def recipeCreate(request):
     if request.method == 'POST':
-        # Include request.FILES to handle file uploads
+        # ฟอร์มจะต้องรองรับการอัปโหลดไฟล์โดยใช้ request.FILES
         recipe_form = RecipeForm(request.POST, request.FILES)
         if recipe_form.is_valid():
-            recipe = recipe_form.save()
-            return redirect('myRecipes')  # Redirect to the recipe list
+            # บันทึกข้อมูลฟอร์มลงในฐานข้อมูล
+            recipe = recipe_form.save(commit=False)
+            recipe.user = request.user  # กำหนดผู้ใช้ที่เพิ่มสูตร
+            recipe.save()
+            return redirect('myRecipes')  # หลังจากบันทึกสำเร็จแล้วจะกลับไปหน้ารายการสูตรของฉัน
     else:
         recipe_form = RecipeForm()
     
+    # แสดงฟอร์มสำหรับเพิ่มสูตรใหม่
     return render(request, 'recipes/recipe_form.html', {'form': recipe_form})
+
 
 # Update an existing recipe
 def recipeUpdate(request, pk):
@@ -66,6 +74,7 @@ def recipeUpdate(request, pk):
         recipe_form = RecipeForm(instance=recipe)
     return render(request, 'recipes/recipe_form.html', {'form': recipe_form})
 
+
 # Delete a recipe
 def recipeDelete(request, pk):
     recipe = get_object_or_404(Recipe, pk=pk)
@@ -73,3 +82,14 @@ def recipeDelete(request, pk):
         recipe.delete()
         return redirect('myRecipes')  # Redirect to the recipe list
     return render(request, 'recipes/recipe_confirm_delete.html', {'recipe': recipe})
+
+@login_required
+def myRecipes(request):
+    # ใช้ request.user ซึ่งเป็น instance ของ User ไม่ใช่ username
+    user_recipes = Recipe.objects.filter(user_id=request.user)
+    return render(request, 'recipes/my_recipes.html', {'recipes': user_recipes})
+
+
+
+    
+    

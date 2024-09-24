@@ -19,6 +19,10 @@ from recipes.views import *
 from django.contrib.auth.views import LogoutView
 from django.conf import settings
 from django.conf.urls.static import static
+from recipes import views
+from .views import myRecipes
+from .views import recipeCreate
+
 
 urlpatterns = [
     path('login/', UserLoginView.as_view(), name='login'),
@@ -29,4 +33,10 @@ urlpatterns = [
     path('recipes/new/', recipeCreate, name='recipe_create'),
     path('recipes/edit/<int:pk>/', recipeUpdate, name='recipe_update'),
     path('recipes/delete/<int:pk>/', recipeDelete, name='recipe_delete'),
+    path('my-recipes/', views.myRecipes, name='myRecipes'),
+    path('my-recipes/', myRecipes, name='myRecipes'),  # URL สำหรับหน้าสูตรของฉัน
+    path('recipes/new/', recipeCreate, name='recipe_create'), # เชื่อมโยงกับฟังก์ชันเพิ่มสูตร
+    
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+
+   
