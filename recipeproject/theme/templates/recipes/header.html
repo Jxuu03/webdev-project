@@ -8,14 +8,19 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link
-        href="https://fonts.googleapis.com/css2?family=Kanit:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap"
-        rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
         * {
             font-family: "Kanit", serif;
-            font-optical-sizing: auto;
-            font-style: normal;
+        }
+
+        .suggestion-item {
+            padding: 10px;
+            cursor: pointer;
+        }
+
+        .suggestion-item:hover {
+            background-color: #f0f0f0;
         }
     </style>
 </head>
@@ -26,25 +31,24 @@
             <div class="flex items-center">
                 <img class="w-28 h-auto object-cover" src="{% static 'recipes/img/logo-1.png' %}" alt="Logo">
             </div>
-            <div class="flex items-center space-x-8 flex-grow">  <!-- Added flex-grow -->
-                <form class="max-w-md mx-auto relative flex-grow">   
+            <div class="flex items-center space-x-8 flex-grow">
+                <form class="max-w-md mx-auto relative flex-grow" id="search-form">
                     <label for="default-search" class="sr-only">Search</label>
                     <div class="relative">
                         <div class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
-                            <svg class="w-4 h-4 text-gray-500" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 20 20">
-                                <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m19 19-4-4m0-7A7 7 0 1 1 1 8a7 7 0 0 1 14 0Z"/>
+                            <svg class="w-4 h-4 text-gray-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 20 20">
+                                <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="m19 19-4-4m0-7A7 7 0 1 1 1 8a7 7 0 0 1 14 0Z" />
                             </svg>
                         </div>
                         <input type="search" id="default-search" class="block w-full p-4 pl-10 text-sm text-gray-900 border border-gray-300 rounded-lg bg-gray-50 focus:ring-blue-500 focus:border-blue-500"
-                            placeholder="ค้นหาชื่อเมนู .." required />
-                        <button type="submit" class="text-white absolute right-2.5 bottom-2.5 bg-orange-400 hover:bg-orange-600 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-4 py-2">
-                            Search
-                        </button>
+                            placeholder="ค้นหาชื่อเมนู .." required autocomplete="off" onkeyup="fetchSuggestions()" />
+                        <!-- Suggestions dropdown -->
+                        <div id="suggestions" class="absolute bg-white border border-gray-300 mt-1 w-full rounded-lg shadow-lg z-10 hidden"></div>
                     </div>
                 </form>
                 <a href="{% url 'home' %}" class="text-gray-700 font-medium hover:text-orange-600 transition">สูตรอาหาร</a>
                 <a href="{% url 'myRecipes' %}" class="text-gray-700 font-medium hover:text-orange-600 transition">สูตรของฉัน</a>
-
                 <a href="{% url 'signup' %}" class="text-gray-700 font-medium hover:text-orange-600 transition">ลงทะเบียน</a>
                 <a href="{% url 'login' %}" class="text-gray-700 font-medium hover:text-orange-600 transition">เข้าสู่ระบบ</a>
                 <form action="{% url 'logout' %}" method="post">
@@ -54,7 +58,43 @@
             </div>
         </div>
     </header>
-</body>
 
+    <script>
+        function fetchSuggestions() {
+            const query = document.getElementById('default-search').value;
+
+            if (query.length === 0) {
+                document.getElementById('suggestions').classList.add('hidden');
+                return;
+            }
+
+            fetch(`/search/?query=${query}`)
+                .then(response => response.json())
+                .then(data => {
+                    const suggestionsBox = document.getElementById('suggestions');
+                    suggestionsBox.innerHTML = ''; // Clear previous suggestions
+
+                    if (data.suggestions.length > 0) {
+                        suggestionsBox.classList.remove('hidden'); // Show suggestions box
+
+                        data.suggestions.forEach(item => {
+                            const suggestionDiv = document.createElement('div');
+                            suggestionDiv.classList.add('suggestion-item');
+                            suggestionDiv.textContent = item.title;
+                            suggestionDiv.onclick = () => {
+                                window.location.href = item.url; // Redirect to the detail page when clicked
+                            };
+                            suggestionsBox.appendChild(suggestionDiv);
+                        });
+                    } else {
+                        suggestionsBox.classList.add('hidden'); // Hide if no suggestions
+                    }
+                })
+                .catch(error => {
+                    console.error('Error fetching suggestions:', error);
+                });
+        }
+    </script>
+</body>
 
 </html>

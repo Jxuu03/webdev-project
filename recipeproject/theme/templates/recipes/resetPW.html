@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    {% load static %}
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            font-family: "Kanit", serif;
+        }
+
+        .suggestion-item {
+            padding: 10px;
+            cursor: pointer;
+        }
+
+        .suggestion-item:hover {
+            background-color: #f0f0f0;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="min-h-screen flex items-center justify-center">
+        <div class="bg-white p-8 rounded-lg max-w-md w-full">
+            <h2 class="text-2xl font-semibold mb-4">Reset Your Password</h2>
+
+            <!-- Step 1: Enter Email -->
+            <div id="step-1" class="mb-4">
+                <label for="email" class="block text-sm font-medium text-gray-700">Email</label>
+                <input type="email" id="email" name="email"
+                    class="w-full p-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500 mb-4"
+                    placeholder="Enter your email" required />
+                <button onclick="submitEmail()" class="w-full bg-orange-500 text-white py-2 rounded-lg hover:bg-orange-600">
+                    Send Verification Code
+                </button>
+            </div>
+
+            <!-- Step 2: Enter Code (Hidden initially) -->
+            <div id="step-2" class="hidden mb-4">
+                <label for="code" class="block text-sm font-medium text-gray-700">Verification Code</label>
+                <input type="text" id="code" name="code"
+                    class="w-full p-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500 mb-4"
+                    placeholder="Enter the code sent to your email" />
+                <button onclick="verifyCode()" class="w-full bg-orange-500 text-white py-2 rounded-lg hover:bg-orange-600">
+                    Verify Code
+                </button>
+            </div>
+
+            <!-- Step 3: Reset Password (Hidden initially) -->
+            <div id="step-3" class="hidden">
+                <label for="new_password" class="block text-sm font-medium text-gray-700">New Password</label>
+                <input type="password" id="new_password" name="new_password"
+                    class="w-full p-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500 mb-4"
+                    placeholder="Enter new password" />
+
+                <label for="confirm_password" class="block text-sm font-medium text-gray-700">Confirm Password</label>
+                <input type="password" id="confirm_password" name="confirm_password"
+                    class="w-full p-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500 mb-4"
+                    placeholder="Confirm new password" />
+
+                <button onclick="resetPassword()" class="w-full bg-orange-500 text-white py-2 rounded-lg hover:bg-orange-600">
+                    Reset Password
+                </button>
+            </div>
+
+            <div id="response" class="mt-4 text-sm text-center hidden"></div>
+        </div>
+    </div>
+
+    <script>
+        function submitEmail() {
+            const email = document.getElementById('email').value;
+
+            fetch("{% url 'reset-password' %}", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/x-www-form-urlencoded",
+                    "X-CSRFToken": "{{ csrf_token }}"
+                },
+                body: new URLSearchParams({ email: email, step: '1' })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.status === 'success') {
+                    document.getElementById('step-1').classList.add('hidden');
+                    document.getElementById('step-2').classList.remove('hidden');
+                } else {
+                    showMessage(data.message, 'error');
+                }
+            });
+        }
+
+        function verifyCode() {
+            const email = document.getElementById('email').value;
+            const code = document.getElementById('code').value;
+
+            fetch("{% url 'reset-password' %}", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/x-www-form-urlencoded",
+                    "X-CSRFToken": "{{ csrf_token }}"
+                },
+                body: new URLSearchParams({ email: email, code: code, step: '2' })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.status === 'success') {
+                    document.getElementById('step-2').classList.add('hidden');
+                    document.getElementById('step-3').classList.remove('hidden');
+                } else {
+                    showMessage(data.message, 'error');
+                }
+            });
+        }
+
+        function resetPassword() {
+            const email = document.getElementById('email').value;
+            const newPassword = document.getElementById('new_password').value;
+            const confirmPassword = document.getElementById('confirm_password').value;
+
+            fetch("{% url 'reset-password' %}", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/x-www-form-urlencoded",
+                    "X-CSRFToken": "{{ csrf_token }}"
+                },
+                body: new URLSearchParams({ email: email, new_password: newPassword, confirm_password: confirmPassword, step: '3' })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.status === 'success') {
+                    showMessage(data.message, 'success');
+                } else {
+                    showMessage(data.message, 'error');
+                }
+            });
+        }
+
+                function showMessage(message, type) {
+            const responseDiv = document.getElementById('response');
+            responseDiv.classList.remove('hidden');
+            responseDiv.textContent = message;
+
+            if (type === 'success') {
+                responseDiv.classList.add('text-green-600');
+                responseDiv.classList.remove('text-red-600');
+            } else {
+                responseDiv.classList.add('text-red-600');
+                responseDiv.classList.remove('text-green-600');
+            }
+
+            // Optional: Reset fields after a short delay (e.g., 2 seconds)
+            if (type === 'success') {
+                setTimeout(() => {
+                    document.getElementById('step-1').classList.remove('hidden');
+                    document.getElementById('step-2').classList.add('hidden');
+                    document.getElementById('step-3').classList.add('hidden');
+                    responseDiv.classList.add('hidden');
+                }, 2000);
+            }
+        }
+    </script>
+</body>
+
+</html>

@@ -19,6 +19,7 @@ from recipes.views import *
 from django.contrib.auth.views import LogoutView
 from django.conf import settings
 from django.conf.urls.static import static
+from . import views
 
 
 
@@ -32,6 +33,8 @@ urlpatterns = [
     path('recipes/new/', recipeCreate, name='recipe-create'),
     path('recipes/edit/<int:pk>/', recipeUpdate, name='recipe-update'),
     path('recipes/delete/<int:pk>/', recipeDelete, name='recipe-delete'),
+    path('search/', views.search_view, name='search_recipes'),
+    path('reset-password/', resetPassword, name='reset-password'),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 
    
