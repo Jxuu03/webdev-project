@@ -3,11 +3,36 @@
 {% block main %}
 {% load static %}
 
+<style>
+    /* Chrome, Safari, and Opera */
+    .scrollbar-hide::-webkit-scrollbar {
+        display: none;
+    }
+
+    .scrollbar-hide {
+        -ms-overflow-style: none;
+        /* Internet Explorer and Edge */
+        scrollbar-width: none;
+        /* Firefox */
+    }
+
+    /* Disable text selection on scroll containers */
+    .recipe-container {
+        user-select: none;
+        /* Prevent text selection */
+    }
+
+    .recipe-container.active {
+        cursor: grabbing;
+        /* Change cursor to indicate dragging */
+    }
+</style>
+
 <div class="flex flex-col items-center justify-center md:h-64 w-3/4 mx-auto" style="margin-top: 160px;">
-    <!-- Carousel container -->
+    <!-- Carousel container with w-3/4 -->
     <div id="default-carousel" class="relative w-3/4" data-carousel="slide">
         <!-- Carousel wrapper with custom height for larger size -->
-        <div class="relative h-56 overflow-hidden rounded-lg md:h-[500px]">
+        <div class="relative h-56 overflow-hidden rounded-lg md:h-[500px] touch-pan-x">
             <!-- Item 1 -->
             <div class="hidden opacity-0 duration-1000 ease-in-out" data-carousel-item>
                 <img src="{% static 'recipes/img/carousel-1.jpg' %}"
@@ -58,22 +83,24 @@
 </div>
 
 <!-- Recipe Sections -->
-<div class="w-3/4 mt-32" style="margin-left: 385px;"> <!-- Adjusted margins to move the recipe sections left -->
+<div class="w-full md:w-1/2 mx-auto mt-32">
     <!-- Appetizer Section -->
     <h2 class="text-2xl font-bold mt-8">Appetizers</h2>
-    <div class="flex overflow-x-auto space-x-4 py-4">
+    <div id="appetizer-container"
+        class="flex overflow-x-auto space-x-4 py-4 pl-4 snap-x snap-mandatory touch-pan-x scrollbar-hide touch-none">
         {% if appetizers %}
             {% for recipe in appetizers %}
                 {% include 'recipes/components/recipe.html' with recipe=recipe %}
             {% endfor %}
         {% else %}
-            <p>No main dish recipes available.</p>
+            <p>No appetizer recipes available.</p>
         {% endif %}
     </div>
 
     <!-- Main Dish Section -->
     <h2 class="text-2xl font-bold mt-8">Main Dishes</h2>
-    <div class="flex overflow-x-auto space-x-4 py-4">
+    <div id="main-dish-container" 
+        class="flex overflow-x-auto space-x-4 py-4 pl-4 snap-x snap-mandatory touch-pan-x">
         {% if main_dishes %}
             {% for recipe in main_dishes %}
                 {% include 'recipes/components/recipe.html' with recipe=recipe %}
@@ -85,7 +112,8 @@
 
     <!-- Dessert Section -->
     <h2 class="text-2xl font-bold mt-8">Desserts</h2>
-    <div class="flex overflow-x-auto space-x-4 py-4">
+    <div id="dessert-container" 
+        class="flex overflow-x-auto space-x-4 py-4 pl-4 snap-x snap-mandatory touch-pan-x">
         {% if desserts %}
             {% for recipe in desserts %}
                 {% include 'recipes/components/recipe.html' with recipe=recipe %}
@@ -95,7 +123,6 @@
         {% endif %}
     </div>
 </div>
-
 
 <script>
     document.addEventListener('DOMContentLoaded', function () {
@@ -150,7 +177,49 @@
             currentIndex = (currentIndex + 1) % carouselItems.length;
             showSlide(currentIndex);
         }, 5000);
+
+        // Touch and mouse scroll functionality for recipe containers
+        const scrollContainers = [
+            document.getElementById('appetizer-container'),
+            document.getElementById('main-dish-container'),
+            document.getElementById('dessert-container')
+        ];
+
+        scrollContainers.forEach(container => {
+            let isDown = false;
+            let startX;
+            let scrollLeft;
+
+            container.addEventListener('mousedown', (e) => {
+                if (e.target.tagName === 'A') return; // Prevent dragging if clicking a link
+                isDown = true;
+                container.classList.add('active');
+                startX = e.pageX - container.offsetLeft;
+                scrollLeft = container.scrollLeft;
+            });
+
+            container.addEventListener('mouseleave', () => {
+                isDown = false;
+                container.classList.remove('active');
+            });
+
+            container.addEventListener('mouseup', () => {
+                isDown = false;
+                container.classList.remove('active');
+            });
+
+            container.addEventListener('mousemove', (e) => {
+                if (!isDown) return;
+                e.preventDefault(); // Prevent text selection
+                const x = e.pageX - container.offsetLeft;
+                const walk = (x - startX) * 2; // Scroll-fast
+                container.scrollLeft = scrollLeft - walk;
+            });
+
+            // Prevent text selection while dragging
+            container.addEventListener('dragstart', (e) => e.preventDefault());
+        });
     });
 </script>
 
-{% endblock main %}
+{% endblock %}

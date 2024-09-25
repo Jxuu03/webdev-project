@@ -19,24 +19,19 @@ from recipes.views import *
 from django.contrib.auth.views import LogoutView
 from django.conf import settings
 from django.conf.urls.static import static
-from recipes import views
-from .views import myRecipes
-from .views import recipeCreate
+
 
 
 urlpatterns = [
     path('login/', UserLoginView.as_view(), name='login'),
     path('signup/', SignUpView.as_view(), name='signup'),
-    path('logout/', LogoutView.as_view(next_page='login'), name='logout'),
+    path('logout/', LogoutView.as_view(next_page='home'), name='logout'),
     path('', home, name='home'),
-    path('recipe/<int:pk>/', recipeDetail, name='recipe_detail'),
-    path('recipes/new/', recipeCreate, name='recipe_create'),
-    path('recipes/edit/<int:pk>/', recipeUpdate, name='recipe_update'),
-    path('recipes/delete/<int:pk>/', recipeDelete, name='recipe_delete'),
-    path('my-recipes/', views.myRecipes, name='myRecipes'),
     path('my-recipes/', myRecipes, name='myRecipes'),  # URL สำหรับหน้าสูตรของฉัน
-    path('recipes/new/', recipeCreate, name='recipe_create'), # เชื่อมโยงกับฟังก์ชันเพิ่มสูตร
-    
+    path('recipe/<int:pk>/', recipeDetailView.as_view(), name='recipe-detail'),
+    path('recipes/new/', recipeCreate, name='recipe-create'),
+    path('recipes/edit/<int:pk>/', recipeUpdate, name='recipe-update'),
+    path('recipes/delete/<int:pk>/', recipeDelete, name='recipe-delete'),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 
    

@@ -12,20 +12,14 @@ class User(models.Model):
     
     def __str__(self):
         return f'{self.username} : {self.email}'
-    
-from django.contrib.auth.models import User
 
 class Recipe(models.Model):
-    user_id = models.ForeignKey(User, related_name='recipes', on_delete=models.CASCADE)
+    user = models.ForeignKey(User, related_name='recipes', on_delete=models.CASCADE)
     title = models.CharField(max_length=200, unique=True)
     category = models.CharField(max_length=50)
     difficulty = models.CharField(max_length=50)
     picture_url = models.ImageField(upload_to='recipes/images/', blank=True, null=True)
     instructions = models.TextField()
-    
-    def __str__(self):
-        return f'{self.title} : {self.category}'
-
     
     def __str__(self):
         return f'{self.title} : {self.category}'
