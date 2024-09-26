@@ -23,16 +23,16 @@ class SignUpView(CreateView):
     template_name = "recipes/signup.html"
 
     def form_valid(self, form):
-        user = form.save(commit=False)
-        user.save()
-        User.objects.create(
-            first_name=user.first_name,
-            last_name=user.last_name,
-            email=user.email,
-            username=user.username,
-            password=make_password(user.password),
+        member = form.save(commit=False)
+        member.save()
+        Member.objects.create(
+            first_name=member.first_name,
+            last_name=member.last_name,
+            email=member.email,
+            username=member.username,
+            password=make_password(member.password),
         )
-        auth_login(self.request, user)
+        auth_login(self.request, member)
         messages.success(self.request, "Registration successful.")
         return super().form_valid(form)
 
@@ -41,6 +41,10 @@ class UserLoginView(LoginView):
     redirect_authenticated_user = True
     template_name = "recipes/login.html"
     success_url = reverse_lazy("home")
+    
+    def form_invalid(self, form):
+        messages.error(self.request, 'Invalid username or password.')
+        return super().form_invalid(form)
 
 
 def home(request):
@@ -48,6 +52,11 @@ def home(request):
     main_dishes = Recipe.objects.filter(category="Main dish")
     desserts = Recipe.objects.filter(category="Dessert")
     
+    appetizer_count = appetizers.count()
+    main_dish_count = main_dishes.count()
+    dessert_count = desserts.count()
+
+    # Pass the counts to the template
     return render(
         request,
         "recipes/home.html",
@@ -55,6 +64,9 @@ def home(request):
             "appetizers": appetizers,
             "main_dishes": main_dishes,
             "desserts": desserts,
+            "appetizer_count": appetizer_count,
+            "main_dish_count": main_dish_count,
+            "dessert_count": dessert_count,
             "MEDIA_URL": settings.MEDIA_URL  
         },
     )
@@ -90,7 +102,7 @@ def recipeCreate(request):
         
         if recipe_form.is_valid():
             recipe = recipe_form.save(commit=False)  # Don't save yet
-            user_instance = User.objects.get(pk=request.user.pk)  # Ensure a User instance
+            user_instance = Member.objects.get(pk=request.user.pk)  # Ensure a User instance
             recipe.user = user_instance  # Assign the user
             recipe.save()  # Now save to the database
 
@@ -152,51 +164,69 @@ def search_view(request):
         return JsonResponse({'suggestions': results})
     return JsonResponse({'suggestions': []})
 
-
+import json
 # Reset password
-verification_codes = {}
 def resetPassword(request):
-    if request.method == "POST":
-        step = request.POST.get('step')
+    verification_codes = request.session.get('verification_codes', {})
 
-        if step == '1':  # Step 1: Email submission
-            email = request.POST.get('email')
+    if request.method == "POST":
+        data = json.loads(request.body)
+        step = data.get('step')
+
+        # Step 1: Send the code to user's email
+        if step == '1':
+            email = data.get('email')
             try:
                 user = User.objects.get(email=email)
-                code = get_random_string(6, allowed_chars='0123456789')  # Generate a 6-digit code
+                
+                # Generate a 6-digit code
+                code = get_random_string(6, allowed_chars='0123456789')
                 verification_codes[email] = code
+                request.session['verification_codes'] = verification_codes
 
                 # Send code via email
                 send_mail(
                     'Password Reset Code',
                     f'Your password reset code is: {code}',
-                    'noreply@example.com',
+                    settings.DEFAULT_FROM_EMAIL,  # e.g., 'noreply@example.com'
                     [email],
                     fail_silently=False,
                 )
                 return JsonResponse({'status': 'success', 'message': 'Code sent successfully.'})
             except User.DoesNotExist:
                 return JsonResponse({'status': 'error', 'message': 'Email not found.'})
+            except Exception as e:
+                print(f"Error sending email: {str(e)}")
+                return JsonResponse({'status': 'error', 'message': 'Failed to send email'})
 
-        elif step == '2':  # Step 2: Code verification
-            email = request.POST.get('email')
-            code = request.POST.get('code')
+        # Step 2: Verify the code
+        elif step == '2':
+            email = data.get('email')
+            code = data.get('code')
 
             if verification_codes.get(email) == code:
                 return JsonResponse({'status': 'success', 'message': 'Code verified successfully.'})
             else:
                 return JsonResponse({'status': 'error', 'message': 'Invalid code.'})
 
-        elif step == '3':  # Step 3: Password reset
-            email = request.POST.get('email')
-            new_password = request.POST.get('new_password')
-            confirm_password = request.POST.get('confirm_password')
+        # Step 3: Reset the password
+        elif step == '3':
+            email = data.get('email')
+            new_password = data.get('new_password')
+            confirm_password = data.get('confirm_password')
 
             if new_password == confirm_password:
-                user = get_object_or_404(User, email=email)
+                user = get_object_or_404(Member, email=email)
                 user.password = make_password(new_password)
                 user.save()
-                del verification_codes[email]  # Remove the code after successful password reset
+                auth_user = get_object_or_404(User, email=email)
+                auth_user.password = make_password(new_password)
+                auth_user.save()
+
+                # Remove the code from the session after successful password reset
+                verification_codes.pop(email, None)
+                request.session['verification_codes'] = verification_codes
+
                 return JsonResponse({'status': 'success', 'message': 'Password reset successfully.'})
             else:
                 return JsonResponse({'status': 'error', 'message': 'Passwords do not match.'})

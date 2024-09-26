@@ -2,7 +2,7 @@ from django.db import models
 
 # Create your models here.
 
-class User(models.Model):
+class Member(models.Model):
     first_name = models.CharField(max_length=100)
     last_name = models.CharField(max_length=100)
     email = models.EmailField(unique=True)
@@ -14,7 +14,7 @@ class User(models.Model):
         return f'{self.username} : {self.email}'
 
 class Recipe(models.Model):
-    user = models.ForeignKey(User, related_name='recipes', on_delete=models.CASCADE)
+    user = models.ForeignKey(Member, related_name='recipes', on_delete=models.CASCADE)
     title = models.CharField(max_length=200, unique=True)
     category = models.CharField(max_length=50)
     difficulty = models.CharField(max_length=50)

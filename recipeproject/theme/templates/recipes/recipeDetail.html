@@ -19,12 +19,6 @@
         <p class="font-semibold">Difficulty: <span class="font-normal">{{ difficulty }}</span></p>  <!-- Display difficulty -->
     </div>
 
-    <!-- Instructions -->
-    <div class="mb-8">
-        <h2 class="text-xl font-semibold text-gray-800 mb-2">Instructions</h2>
-        <p class="ml-10 text-gray-700 leading-relaxed">{{ instructions }}</p>
-    </div>
-
     <!-- Ingredients List -->
     <div>
         <h2 class="text-xl font-semibold text-gray-800 mb-4">Ingredients</h2>
@@ -37,6 +31,12 @@
                 </li>
             {% endfor %}
         </ul>
+    </div>
+
+    <!-- Instructions -->
+    <div class="mb-8">
+        <h2 class="text-xl font-semibold text-gray-800 mb-2">Instructions</h2>
+        <p class="ml-10 text-gray-700 leading-relaxed">{{ instructions|linebreaks }}</p>
     </div>
 </div>
 {% endblock %}
