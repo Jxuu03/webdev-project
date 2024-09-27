@@ -29,11 +29,9 @@ class SignUpView(CreateView):
             first_name=member.first_name,
             last_name=member.last_name,
             email=member.email,
-            username=member.username,
-            password=make_password(member.password),
+            username=member,
         )
         auth_login(self.request, member)
-        messages.success(self.request, "Registration successful.")
         return super().form_valid(form)
 
 
@@ -102,8 +100,7 @@ def recipeCreate(request):
         
         if recipe_form.is_valid():
             recipe = recipe_form.save(commit=False)  # Don't save yet
-            user_instance = Member.objects.get(pk=request.user.pk)  # Ensure a User instance
-            recipe.user = user_instance  # Assign the user
+            recipe.user = Member.objects.get(username=request.user)
             recipe.save()  # Now save to the database
 
             # Process ingredients if applicable
@@ -123,7 +120,6 @@ def recipeCreate(request):
         recipe_form = RecipeForm()
 
     return render(request, 'recipes/recipe_form.html', {'form': recipe_form})
-
 
 # Update an existing recipe
 @login_required
@@ -152,7 +148,7 @@ def recipeDelete(request, pk):
 @login_required
 def myRecipes(request):
     # ใช้ request.user ซึ่งเป็น instance ของ User ไม่ใช่ username
-    user_recipes = Recipe.objects.filter(user=request.user.id)
+    user_recipes = Recipe.objects.filter(user__username=request.user)
     return render(request, 'recipes/my_recipes.html', {'recipes': user_recipes})
 
 # Search bar with suggestion

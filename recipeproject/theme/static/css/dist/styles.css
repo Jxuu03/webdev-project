@@ -938,6 +938,10 @@ select {
   display: none;
 }
 
+.h-1\/5 {
+  height: 20%;
+}
+
 .h-10 {
   height: 2.5rem;
 }
