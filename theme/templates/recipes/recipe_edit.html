@@ -1,0 +1,135 @@
+{% extends 'recipes/base.html' %}
+
+{% block main %}
+<div class="max-w-2xl mx-auto mt-10 bg-white shadow-lg rounded-lg p-8 border border-orange-300">
+    <h2 class="text-3xl font-bold text-orange-600 mb-6 text-center">แก้ไขสูตรอาหาร</h2>
+    
+    <form method="POST" enctype="multipart/form-data" class="space-y-6">
+        {% csrf_token %}
+
+        <!-- Recipe Title -->
+        <div>
+            <label for="title" class="block text-lg font-semibold text-gray-700">ชื่อสูตรอาหาร</label>
+            <input type="text" name="title" id="title" value="{{ recipe.title }}" class="w-full p-4 bg-orange-50 border border-gray-300 rounded-lg shadow-md focus:ring focus:ring-orange-400 focus:outline-none transition duration-150 ease-in-out" required>
+        </div>
+
+        <!-- Upload Image -->
+        <div class="flex items-center space-x-4">
+            <label for="picture_url" class="block text-lg font-semibold text-gray-700">อัปโหลดรูปภาพ</label>
+            <input type="file" name="picture_url" id="picture_url" class="p-2 border border-gray-300 bg-gray-50 rounded-lg shadow-md focus:outline-none focus:ring focus:ring-green-500 transition duration-150 ease-in-out">
+            <img src="{{ recipe.picture_url.url }}" alt="Current Recipe Image" class="w-24 h-24 rounded-md">  <!-- Show current image -->
+        </div>
+
+        <!-- Difficulty -->
+        <div>
+            <label for="difficulty" class="block text-lg font-semibold text-gray-700">ระดับความยาก</label>
+            <select name="difficulty" id="difficulty" class="w-full p-3 bg-yellow-50 border border-gray-300 rounded-md shadow-md focus:ring focus:ring-orange-500 focus:outline-none">
+                <option value="Easy" {% if recipe.difficulty == "Easy" %}selected{% endif %}>ง่าย</option>
+                <option value="Medium" {% if recipe.difficulty == "Medium" %}selected{% endif %}>ปานกลาง</option>
+                <option value="Hard" {% if recipe.difficulty == "Hard" %}selected{% endif %}>ยาก</option>
+            </select>
+        </div>
+
+        <!-- Category (Radio Button) -->
+        <div class="bg-gray-50 p-6 rounded-lg shadow-md mt-6">
+            <label class="block text-lg font-semibold text-gray-700">หมวดหมู่</label>
+            <div class="mt-3 space-y-2">
+                <div>
+                    <input type="radio" name="category" id="appetizer" value="Appetizer" {% if recipe.category == "Appetizer" %}checked{% endif %} class="mr-2">
+                    <label for="appetizer" class="text-gray-600">อาหารว่าง</label>
+                </div>
+                <div>
+                    <input type="radio" name="category" id="main-dish" value="Main dish" {% if recipe.category == "Main dish" %}checked{% endif %} class="mr-2">
+                    <label for="main-dish" class="text-gray-600">จานหลัก</label>
+                </div>
+                <div>
+                    <input type="radio" name="category" id="dessert" value="Dessert" {% if recipe.category == "Dessert" %}checked{% endif %} class="mr-2">
+                    <label for="dessert" class="text-gray-600">ของหวาน</label>
+                </div>
+            </div>
+        </div>
+
+        <!-- Ingredients Section -->
+        <div class="bg-gray-50 p-6 rounded-lg shadow-md mt-6">
+            <h3 class="text-2xl font-semibold text-gray-700 mb-4">ส่วนผสม</h3>
+            <div id="ingredient-fields" class="space-y-4">
+                {% for ingredient in recipe.ingredients.all %}
+                <div class="bg-gray-100 p-4 rounded-lg shadow-md ingredient-form">
+                    <label for="ingredient" class="block text-lg font-medium text-gray-600">ชื่อส่วนผสม</label>
+                    <input type="text" name="ingredient" value="{{ ingredient.name }}" class="w-full p-2 border border-gray-300 rounded-lg shadow-sm focus:ring focus:ring-orange-500 focus:outline-none transition duration-150 ease-in-out" required>
+
+                    <label for="amount" class="block text-lg font-medium text-gray-600 mt-4">จำนวน</label>
+                    <input type="number" name="amount" value="{{ ingredient.amount }}" class="w-full p-2 border border-gray-300 rounded-lg shadow-sm focus:ring focus:ring-orange-500 focus:outline-none transition duration-150 ease-in-out" required>
+
+                    <label for="unit" class="block text-lg font-medium text-gray-600 mt-4">หน่วย</label>
+                    <select name="unit" class="w-full p-2 border border-gray-300 rounded-lg focus:ring focus:ring-orange-500 focus:outline-none">
+                        <option value="g" {% if ingredient.unit == "g" %}selected{% endif %}>กรัม</option>
+                        <option value="cup" {% if ingredient.unit == "cup" %}selected{% endif %}>ถ้วย</option>
+                        <option value="tsp" {% if ingredient.unit == "tsp" %}selected{% endif %}>ช้อนชา</option>
+                        <option value="tbsp" {% if ingredient.unit == "tbsp" %}selected{% endif %}>ช้อนโต๊ะ</option>
+                        <option value="oz" {% if ingredient.unit == "oz" %}selected{% endif %}>ออนซ์</option>
+                    </select>
+
+                    <button type="button" class="mt-4 px-3 py-2 bg-red-500 text-white rounded-lg shadow hover:bg-red-600 transition duration-150 ease-in-out delete-ingredient">ลบส่วนผสม</button>
+                </div>
+                {% endfor %}
+            </div>
+
+            <button type="button" id="add-ingredient" class="mt-4 px-4 py-2 bg-blue-500 text-white rounded-lg shadow hover:bg-blue-600 transition duration-150 ease-in-out">เพิ่มส่วนผสมอีก</button>
+        </div>
+
+        <!-- Instructions -->
+        <div class="bg-gray-50 p-6 rounded-lg shadow-md mt-6">
+            <label for="instructions" class="block text-lg font-semibold text-gray-700">วิธีทำ</label>
+            <textarea name="instructions" id="instructions" rows="6" class="w-full p-3 bg-blue-50 border border-gray-300 rounded-lg shadow-sm focus:ring focus:ring-orange-500 focus:outline-none transition duration-150 ease-in-out" placeholder="ใส่วิธีการทำอาหาร" required>{{ recipe.instructions }}</textarea>
+        </div>
+
+        <!-- Submit Button -->
+        <div class="flex justify-end mt-6">
+            <button type="submit" class="bg-green-500 text-white px-6 py-3 rounded-lg shadow hover:bg-green-600 transition duration-150 ease-in-out">บันทึกการแก้ไขสูตรอาหาร</button>
+        </div>
+    </form>
+</div>
+
+<!-- JavaScript to dynamically add and remove ingredient fields -->
+<script>
+    document.getElementById('add-ingredient').addEventListener('click', function() {
+        const ingredientFields = document.getElementById('ingredient-fields');
+        const newIngredient = document.createElement('div');
+        newIngredient.className = 'bg-gray-100 p-4 rounded-lg shadow-md ingredient-form';
+        newIngredient.innerHTML = `
+            <label for="ingredient" class="block text-lg font-medium text-gray-600">ชื่อส่วนผสม</label>
+            <input type="text" name="ingredient" class="w-full p-2 border border-gray-300 rounded-lg shadow-sm focus:ring focus:ring-orange-500 focus:outline-none" required>
+
+            <label for="amount" class="block text-lg font-medium text-gray-600 mt-4">จำนวน</label>
+            <input type="number" name="amount" class="w-full p-2 border border-gray-300 rounded-lg shadow-sm focus:ring focus:ring-orange-500 focus:outline-none" required>
+
+            <label for="unit" class="block text-lg font-medium text-gray-600 mt-4">หน่วย</label>
+            <select name="unit" class="w-full p-2 border border-gray-300 rounded-lg focus:ring focus:ring-orange-500 focus:outline-none">
+                <option value="g">กรัม</option>
+                <option value="cup">ถ้วย</option>
+                <option value="tsp">ช้อนชา</option>
+                <option value="tbsp">ช้อนโต๊ะ</option>
+                <option value="oz">ออนซ์</option>
+            </select>
+
+            <button type="button" class="mt-4 px-3 py-2 bg-red-500 text-white rounded-lg shadow hover:bg-red-600 delete-ingredient">ลบส่วนผสม</button>
+        `;
+        ingredientFields.appendChild(newIngredient);
+
+        // Add delete functionality to the new ingredient
+        newIngredient.querySelector('.delete-ingredient').addEventListener('click', function() {
+            ingredientFields.removeChild(newIngredient);
+        });
+    });
+
+    // Delete existing ingredient functionality
+    document.querySelectorAll('.delete-ingredient').forEach(button => {
+        button.addEventListener('click', function() {
+            const ingredientForm = this.closest('.ingredient-form');
+            ingredientFields.removeChild(ingredientForm);
+        });
+    });
+</script>
+
+{% endblock %}

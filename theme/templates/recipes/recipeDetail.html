@@ -1,0 +1,44 @@
+{% extends 'recipes/base.html' %}
+
+{% block main %}
+<div class="container mx-auto mt-10 mb-10 p-6 bg-white shadow-lg rounded-lg max-w-4xl">
+    <!-- Recipe Image -->
+    <div class="mb-6">
+        <img src="{{ MEDIA_URL }}{{ picture_url }}" alt="{{ title }}" class="w-full h-1/5 object-cover rounded-lg shadow-md">
+    </div>
+
+    <!-- Recipe Title and User (Prepared by) -->
+    <div class="text-center mb-4">
+        <h1 class="text-3xl font-bold text-gray-900 mb-2">{{ title }}</h1>
+        <p class="text-sm text-gray-600">Prepared by: <span class="font-semibold">{{ user }}</span></p>  <!-- Username centered below title -->
+    </div>
+
+    <!-- Flex container for category and difficulty with padding -->
+    <div class="flex justify-around text-sm text-gray-600 mb-8 px-8">
+        <p class="font-semibold">Category: <span class="font-normal">{{ category }}</span></p>  <!-- Display category -->
+        <p class="font-semibold">Difficulty: <span class="font-normal">{{ difficulty }}</span></p>  <!-- Display difficulty -->
+    </div>
+
+    <!-- Ingredients List -->
+    <div>
+        <h2 class="text-xl font-semibold text-gray-800 mb-4">Ingredients</h2>
+        <ul class="ml-10 list-disc list-inside text-gray-700">
+            {% for ingredient in ingredients %}
+                <li class="mb-2">
+                    <span class="font-medium">{{ ingredient.name }}</span>: 
+                    <span>{{ ingredient.amount }}</span> 
+                    <span>{{ ingredient.unit }}</span>
+                </li>
+            {% endfor %}
+        </ul>
+    </div>
+
+    <!-- Instructions -->
+    <div class="mb-8">
+        <h2 class="text-xl font-semibold text-gray-800 mb-2">Instructions</h2>
+        <div class="ml-10">
+            <p class="text-gray-700 leading-relaxed">{{ instructions|linebreaks }}</p>
+        </div>
+    </div>
+</div>
+{% endblock %}

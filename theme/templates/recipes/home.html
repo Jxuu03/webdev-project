@@ -1,0 +1,252 @@
+{% extends 'recipes/base.html' %}
+
+{% block main %}
+{% load static %}
+
+<style>
+    /* Styles for scrollbar hiding */
+    .scrollbar-hide::-webkit-scrollbar {
+        display: none;
+    }
+
+    .scrollbar-hide {
+        -ms-overflow-style: none; /* Internet Explorer and Edge */
+        scrollbar-width: none; /* Firefox */
+    }
+
+    /* Disable text selection on scroll containers */
+    .recipe-container {
+        user-select: none; /* Prevent text selection */
+    }
+
+    .recipe-container.active {
+        cursor: grabbing; /* Change cursor to indicate dragging */
+    }
+
+    /* Custom styles */
+    .section-title {
+        color: #ff5733; /* Orange color */
+        font-family: 'Kanit', serif;
+        font-weight: 700;
+    }
+
+    .recipe-card {
+        transition: transform 0.2s;
+        background-color: #fff3e0; /* Light orange background */
+        border-radius: 10px;
+        padding: 10px;
+    }
+
+    .recipe-card:hover {
+        transform: scale(1.05); /* Slightly enlarge on hover */
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2); /* Add shadow */
+    }
+
+    .no-recipes {
+        color: #999;
+        text-align: center;
+    }
+</style>
+
+<div class="flex flex-col items-center justify-center md:h-64 w-3/4 mx-auto" style="margin-top: 160px;">
+    <!-- Carousel container -->
+    <div id="default-carousel" class="relative w-3/4" data-carousel="slide">
+        <div class="relative h-56 overflow-hidden rounded-lg md:h-[500px] touch-pan-x">
+            <!-- Carousel items -->
+            <div class="hidden opacity-0 duration-1000 ease-in-out" data-carousel-item>
+                <img src="{% static 'recipes/img/carousel-1.jpg' %}" class="absolute block w-full -translate-x-1/2 -translate-y-1/2 top-1/2 left-1/2" alt="Slide 1">
+            </div>
+            <div class="hidden opacity-0 duration-1000 ease-in-out" data-carousel-item>
+                <img src="{% static 'recipes/img/carousel-2.jpg' %}" class="absolute block w-full -translate-x-1/2 -translate-y-1/2 top-1/2 left-1/2" alt="Slide 2">
+            </div>
+            <div class="hidden opacity-0 duration-1000 ease-in-out" data-carousel-item>
+                <img src="{% static 'recipes/img/carousel-3.jpg' %}" class="absolute block w-full -translate-x-1/2 -translate-y-1/2 top-1/2 left-1/2" alt="Slide 3">
+            </div>
+            <div class="hidden opacity-0 duration-1000 ease-in-out" data-carousel-item id="pie-chart-slide">
+                <div class="flex justify-center items-center h-96 w-full mt-10">
+                    <canvas id="recipeCategoryChart" width="300" height="300"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slider indicators -->
+        <div class="absolute z-30 flex -translate-x-1/2 bottom-5 left-1/2 space-x-3 rtl:space-x-reverse">
+            <button type="button" class="w-3 h-3 rounded-full bg-white" data-carousel-slide-to="0" aria-label="Slide 1"></button>
+            <button type="button" class="w-3 h-3 rounded-full bg-white" data-carousel-slide-to="1" aria-label="Slide 2"></button>
+            <button type="button" class="w-3 h-3 rounded-full bg-white" data-carousel-slide-to="2" aria-label="Slide 3"></button>
+            <button type="button" class="w-3 h-3 rounded-full bg-white" data-carousel-slide-to="3" aria-label="Slide 4"></button>
+        </div>
+
+        <!-- Slider controls -->
+        <button type="button" class="absolute top-0 left-0 z-30 flex items-center justify-center h-full px-4 cursor-pointer" data-carousel-prev>
+            <span class="inline-flex items-center justify-center w-10 h-10 rounded-full bg-white/30 hover:bg-white/50 focus:ring-4 focus:ring-white">
+                <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
+                </svg>
+            </span>
+        </button>
+        <button type="button" class="absolute top-0 right-0 z-30 flex items-center justify-center h-full px-4 cursor-pointer" data-carousel-next>
+            <span class="inline-flex items-center justify-center w-10 h-10 rounded-full bg-white/30 hover:bg-white/50 focus:ring-4 focus:ring-white">
+                <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+                </svg>
+            </span>
+        </button>
+    </div>
+</div>
+
+<!-- Recipe Sections -->
+<div class="w-full md:w-1/2 mx-auto mt-32">
+    <!-- Appetizer Section -->
+    <h2 class="section-title text-2xl font-bold mt-8">ของว่าง (Appetizers)</h2>
+    <div id="appetizer-container" class="flex overflow-x-auto space-x-4 py-4 pl-4 snap-x snap-mandatory touch-pan-x">
+        {% if appetizers %}
+        {% for recipe in appetizers %}
+        <div class="recipe-card">
+            {% include 'recipes/components/recipe.html' with recipe=recipe %}
+        </div>
+        {% endfor %}
+        {% else %}
+        <p class="no-recipes">No appetizer recipes available.</p>
+        {% endif %}
+    </div>
+
+    <!-- Main Dish Section -->
+    <h2 class="section-title text-2xl font-bold mt-8">อาหารจานหลัก (Main Dishes)</h2>
+    <div id="main-dish-container" class="flex overflow-x-auto space-x-4 py-4 pl-4 snap-x snap-mandatory touch-pan-x">
+        {% if main_dishes %}
+        {% for recipe in main_dishes %}
+        <div class="recipe-card">
+            {% include 'recipes/components/recipe.html' with recipe=recipe %}
+        </div>
+        {% endfor %}
+        {% else %}
+        <p class="no-recipes">No main dish recipes available.</p>
+        {% endif %}
+    </div>
+
+    <!-- Dessert Section -->
+    <h2 class="section-title text-2xl font-bold mt-8">ของหวาน (Desserts)</h2>
+    <div id="dessert-container" class="flex overflow-x-auto space-x-4 py-4 pl-4 snap-x snap-mandatory touch-pan-x">
+        {% if desserts %}
+        {% for recipe in desserts %}
+        <div class="recipe-card">
+            {% include 'recipes/components/recipe.html' with recipe=recipe %}
+        </div>
+        {% endfor %}
+        {% else %}
+        <p class="no-recipes">No dessert recipes available.</p>
+        {% endif %}
+    </div>
+</div>
+
+
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        let carouselItems = document.querySelectorAll('[data-carousel-item]');
+        let currentIndex = 0;
+
+        function showSlide(index) {
+            carouselItems.forEach((item, i) => {
+                if (i === index) {
+                    item.classList.remove('hidden');
+                    item.classList.remove('opacity-0');
+                    item.classList.add('opacity-100'); // Fade in effect
+                } else {
+                    item.classList.add('hidden');
+                    item.classList.remove('opacity-100');
+                    item.classList.add('opacity-0'); // Fade out effect
+                }
+            });
+
+            // Update indicators
+            document.querySelectorAll('[data-carousel-slide-to]').forEach((indicator, i) => {
+                indicator.setAttribute('aria-current', i === index ? 'true' : 'false');
+                indicator.classList.toggle('bg-orange-500', i === index); // Change color for active indicator
+            });
+
+            // Render the pie chart only when the 4th slide is active
+            if (index === 3) {
+                renderPieChart();
+            }
+        }
+
+        // Show the next slide
+        document.querySelector('[data-carousel-next]').addEventListener('click', function () {
+            currentIndex = (currentIndex + 1) % carouselItems.length;
+            showSlide(currentIndex);
+        });
+
+        // Show the previous slide
+        document.querySelector('[data-carousel-prev]').addEventListener('click', function () {
+            currentIndex = (currentIndex - 1 + carouselItems.length) % carouselItems.length;
+            showSlide(currentIndex);
+        });
+
+        // Handle indicators
+        document.querySelectorAll('[data-carousel-slide-to]').forEach((indicator, i) => {
+            indicator.addEventListener('click', function () {
+                currentIndex = i;
+                showSlide(i);
+            });
+        });
+
+        // Initialize the carousel
+        showSlide(currentIndex);
+
+        // Auto-advance the carousel every 5 seconds (5000 milliseconds)
+        setInterval(() => {
+            currentIndex = (currentIndex + 1) % carouselItems.length;
+            showSlide(currentIndex);
+        }, 5000);
+
+        // Function to render the pie chart
+        function renderPieChart() {
+            if (!document.getElementById('recipeCategoryChart').hasAttribute('data-rendered')) {
+                const ctx = document.getElementById('recipeCategoryChart').getContext('2d');
+                const recipeCategoryChart = new Chart(ctx, {
+                    type: 'pie',
+                    data: {
+                        labels: ['Appetizers', 'Main Dishes', 'Desserts'],
+                        datasets: [{
+                            label: 'Recipe Categories',
+                            data: [{{ appetizer_count }}, {{ main_dish_count }}, {{ dessert_count }}],
+                            backgroundColor: ['#ff6384', '#36a2eb', '#cc65fe'],
+                            hoverOffset: 4
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        plugins: {
+                            legend: {
+                                position: 'top',
+                            },
+                            tooltip: {
+                                callbacks: {
+                                    label: function (tooltipItem) {
+                                        return tooltipItem.label + ': ' + tooltipItem.raw;
+                                    }
+                                }
+                            },
+                            title: {
+                                display: true,
+                                text: 'สัดส่วนประเภทสูตรอาหารในระบบ',
+                                font: {
+                                    family: 'Kanit',
+                                    size: '24px'
+                                }
+                            }
+                        }
+                    }
+                });
+
+                // Mark the chart as rendered to avoid re-rendering
+                document.getElementById('recipeCategoryChart').setAttribute('data-rendered', 'true');
+            }
+        }
+    });
+</script>
+
+{% endblock %}
