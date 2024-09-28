@@ -4,51 +4,64 @@
 {% load static %}
 
 <style>
-    /* Chrome, Safari, and Opera */
+    /* Styles for scrollbar hiding */
     .scrollbar-hide::-webkit-scrollbar {
         display: none;
     }
 
     .scrollbar-hide {
-        -ms-overflow-style: none;
-        /* Internet Explorer and Edge */
-        scrollbar-width: none;
-        /* Firefox */
+        -ms-overflow-style: none; /* Internet Explorer and Edge */
+        scrollbar-width: none; /* Firefox */
     }
 
     /* Disable text selection on scroll containers */
     .recipe-container {
-        user-select: none;
-        /* Prevent text selection */
+        user-select: none; /* Prevent text selection */
     }
 
     .recipe-container.active {
-        cursor: grabbing;
-        /* Change cursor to indicate dragging */
+        cursor: grabbing; /* Change cursor to indicate dragging */
+    }
+
+    /* Custom styles */
+    .section-title {
+        color: #ff5733; /* Orange color */
+        font-family: 'Kanit', serif;
+        font-weight: 700;
+    }
+
+    .recipe-card {
+        transition: transform 0.2s;
+        background-color: #fff3e0; /* Light orange background */
+        border-radius: 10px;
+        padding: 10px;
+    }
+
+    .recipe-card:hover {
+        transform: scale(1.05); /* Slightly enlarge on hover */
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2); /* Add shadow */
+    }
+
+    .no-recipes {
+        color: #999;
+        text-align: center;
     }
 </style>
 
 <div class="flex flex-col items-center justify-center md:h-64 w-3/4 mx-auto" style="margin-top: 160px;">
-    <!-- Carousel container with w-3/4 -->
+    <!-- Carousel container -->
     <div id="default-carousel" class="relative w-3/4" data-carousel="slide">
-        <!-- Carousel wrapper with custom height for larger size -->
         <div class="relative h-56 overflow-hidden rounded-lg md:h-[500px] touch-pan-x">
-            <!-- Item 1 -->
+            <!-- Carousel items -->
             <div class="hidden opacity-0 duration-1000 ease-in-out" data-carousel-item>
-                <img src="{% static 'recipes/img/carousel-1.jpg' %}"
-                    class="absolute block w-full -translate-x-1/2 -translate-y-1/2 top-1/2 left-1/2" alt="Slide 1">
+                <img src="{% static 'recipes/img/carousel-1.jpg' %}" class="absolute block w-full -translate-x-1/2 -translate-y-1/2 top-1/2 left-1/2" alt="Slide 1">
             </div>
-            <!-- Item 2 -->
             <div class="hidden opacity-0 duration-1000 ease-in-out" data-carousel-item>
-                <img src="{% static 'recipes/img/carousel-2.jpg' %}"
-                    class="absolute block w-full -translate-x-1/2 -translate-y-1/2 top-1/2 left-1/2" alt="Slide 2">
+                <img src="{% static 'recipes/img/carousel-2.jpg' %}" class="absolute block w-full -translate-x-1/2 -translate-y-1/2 top-1/2 left-1/2" alt="Slide 2">
             </div>
-            <!-- Item 3 -->
             <div class="hidden opacity-0 duration-1000 ease-in-out" data-carousel-item>
-                <img src="{% static 'recipes/img/carousel-3.jpg' %}"
-                    class="absolute block w-full -translate-x-1/2 -translate-y-1/2 top-1/2 left-1/2" alt="Slide 3">
+                <img src="{% static 'recipes/img/carousel-3.jpg' %}" class="absolute block w-full -translate-x-1/2 -translate-y-1/2 top-1/2 left-1/2" alt="Slide 3">
             </div>
-            <!-- Item 4: Pie Chart -->
             <div class="hidden opacity-0 duration-1000 ease-in-out" data-carousel-item id="pie-chart-slide">
                 <div class="flex justify-center items-center h-96 w-full mt-10">
                     <canvas id="recipeCategoryChart" width="300" height="300"></canvas>
@@ -58,32 +71,22 @@
 
         <!-- Slider indicators -->
         <div class="absolute z-30 flex -translate-x-1/2 bottom-5 left-1/2 space-x-3 rtl:space-x-reverse">
-            <button type="button" class="w-3 h-3 rounded-full bg-white" data-carousel-slide-to="0"
-                aria-label="Slide 1"></button>
-            <button type="button" class="w-3 h-3 rounded-full bg-white" data-carousel-slide-to="1"
-                aria-label="Slide 2"></button>
-            <button type="button" class="w-3 h-3 rounded-full bg-white" data-carousel-slide-to="2"
-                aria-label="Slide 3"></button>
-            <button type="button" class="w-3 h-3 rounded-full bg-white" data-carousel-slide-to="3"
-                aria-label="Slide 4"></button>
+            <button type="button" class="w-3 h-3 rounded-full bg-white" data-carousel-slide-to="0" aria-label="Slide 1"></button>
+            <button type="button" class="w-3 h-3 rounded-full bg-white" data-carousel-slide-to="1" aria-label="Slide 2"></button>
+            <button type="button" class="w-3 h-3 rounded-full bg-white" data-carousel-slide-to="2" aria-label="Slide 3"></button>
+            <button type="button" class="w-3 h-3 rounded-full bg-white" data-carousel-slide-to="3" aria-label="Slide 4"></button>
         </div>
 
         <!-- Slider controls -->
-        <button type="button"
-            class="absolute top-0 left-0 z-30 flex items-center justify-center h-full px-4 cursor-pointer"
-            data-carousel-prev>
-            <span
-                class="inline-flex items-center justify-center w-10 h-10 rounded-full bg-white/30 hover:bg-white/50 focus:ring-4 focus:ring-white">
+        <button type="button" class="absolute top-0 left-0 z-30 flex items-center justify-center h-full px-4 cursor-pointer" data-carousel-prev>
+            <span class="inline-flex items-center justify-center w-10 h-10 rounded-full bg-white/30 hover:bg-white/50 focus:ring-4 focus:ring-white">
                 <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
                 </svg>
             </span>
         </button>
-        <button type="button"
-            class="absolute top-0 right-0 z-30 flex items-center justify-center h-full px-4 cursor-pointer"
-            data-carousel-next>
-            <span
-                class="inline-flex items-center justify-center w-10 h-10 rounded-full bg-white/30 hover:bg-white/50 focus:ring-4 focus:ring-white">
+        <button type="button" class="absolute top-0 right-0 z-30 flex items-center justify-center h-full px-4 cursor-pointer" data-carousel-next>
+            <span class="inline-flex items-center justify-center w-10 h-10 rounded-full bg-white/30 hover:bg-white/50 focus:ring-4 focus:ring-white">
                 <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
                 </svg>
@@ -93,44 +96,51 @@
 </div>
 
 <!-- Recipe Sections -->
-<div class="w-full md:w-1/2 mx-auto mt-32">
+<div class="w-full md:w-1/2 mx-auto mt-32 recipe-container">
     <!-- Appetizer Section -->
-    <h2 class="text-2xl font-bold mt-8">ของว่าง (Appetizers)</h2>
-    <div id="appetizer-container"
-        class="flex overflow-x-auto space-x-4 py-4 pl-4 snap-x snap-mandatory touch-pan-x scrollbar-hide touch-none">
+    <h2 class="section-title text-2xl font-bold mt-8">ของว่าง (Appetizers)</h2>
+    <div id="appetizer-container" class="flex overflow-x-auto space-x-4 py-4 pl-4 snap-x snap-mandatory touch-pan-x scrollbar-hide scroll-smooth">
         {% if appetizers %}
         {% for recipe in appetizers %}
-        {% include 'recipes/components/recipe.html' with recipe=recipe %}
+        <div class="recipe-card">
+            {% include 'recipes/components/recipe.html' with recipe=recipe %}
+        </div>
         {% endfor %}
         {% else %}
-        <p>No appetizer recipes available.</p>
+        <p class="no-recipes">No appetizer recipes available.</p>
         {% endif %}
     </div>
 
     <!-- Main Dish Section -->
-    <h2 class="text-2xl font-bold mt-8">อาหารจานหลัก (Main Dishes)</h2>
-    <div id="main-dish-container" class="flex overflow-x-auto space-x-4 py-4 pl-4 snap-x snap-mandatory touch-pan-x">
+    <h2 class="section-title text-2xl font-bold mt-8">อาหารจานหลัก (Main Dishes)</h2>
+    <div id="main-dish-container" class="flex overflow-x-auto space-x-4 py-4 pl-4 snap-x snap-mandatory touch-pan-x scrollbar-hide scroll-smooth">
         {% if main_dishes %}
         {% for recipe in main_dishes %}
-        {% include 'recipes/components/recipe.html' with recipe=recipe %}
+        <div class="recipe-card">
+            {% include 'recipes/components/recipe.html' with recipe=recipe %}
+        </div>
         {% endfor %}
         {% else %}
-        <p>No main dish recipes available.</p>
+        <p class="no-recipes">No main dish recipes available.</p>
         {% endif %}
     </div>
 
     <!-- Dessert Section -->
-    <h2 class="text-2xl font-bold mt-8">ของหวาน (Desserts)</h2>
-    <div id="dessert-container" class="flex overflow-x-auto space-x-4 py-4 pl-4 snap-x snap-mandatory touch-pan-x">
+    <h2 class="section-title text-2xl font-bold mt-8">ของหวาน (Desserts)</h2>
+    <div id="dessert-container" class="flex overflow-x-auto space-x-4 py-4 pl-4 snap-x snap-mandatory touch-pan-x scrollbar-hide scroll-smooth">
         {% if desserts %}
         {% for recipe in desserts %}
-        {% include 'recipes/components/recipe.html' with recipe=recipe %}
+        <div class="recipe-card">
+            {% include 'recipes/components/recipe.html' with recipe=recipe %}
+        </div>
         {% endfor %}
         {% else %}
-        <p>No dessert recipes available.</p>
+        <p class="no-recipes">No dessert recipes available.</p>
         {% endif %}
     </div>
 </div>
+
+
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
@@ -154,7 +164,7 @@
             // Update indicators
             document.querySelectorAll('[data-carousel-slide-to]').forEach((indicator, i) => {
                 indicator.setAttribute('aria-current', i === index ? 'true' : 'false');
-                indicator.classList.toggle('bg-orange-500', i === index); // Optional: Change color for the active indicator
+                indicator.classList.toggle('bg-orange-500', i === index); // Change color for active indicator
             });
 
             // Render the pie chart only when the 4th slide is active
@@ -191,6 +201,46 @@
             currentIndex = (currentIndex + 1) % carouselItems.length;
             showSlide(currentIndex);
         }, 5000);
+
+        const scrollContainers = [
+            document.getElementById('appetizer-container'),
+            document.getElementById('main-dish-container'),
+            document.getElementById('dessert-container')
+        ];
+
+        scrollContainers.forEach(container => {
+            let isDown = false;
+            let startX;
+            let scrollLeft;
+
+            container.addEventListener('mousedown', (e) => {
+                isDown = true;
+                container.classList.add('active'); // Add a class to indicate dragging
+                startX = e.pageX - container.offsetLeft;
+                scrollLeft = container.scrollLeft;
+            });
+
+            container.addEventListener('mouseleave', () => {
+                isDown = false;
+                container.classList.remove('active');
+            });
+
+            container.addEventListener('mouseup', () => {
+                isDown = false;
+                container.classList.remove('active');
+            });
+
+            container.addEventListener('mousemove', (e) => {
+                if (!isDown) return;
+                e.preventDefault(); // Prevent text selection
+                const x = e.pageX - container.offsetLeft;
+                const walk = (x - startX) * 2; // Scroll-fast
+                container.scrollLeft = scrollLeft - walk;
+            });
+
+            // Prevent text selection while dragging
+            container.addEventListener('dragstart', (e) => e.preventDefault());
+        });
 
         // Function to render the pie chart
         function renderPieChart() {

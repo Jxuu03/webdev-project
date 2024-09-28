@@ -20,13 +20,32 @@
         }
 
         .suggestion-item:hover {
-            background-color: #f0f0f0;
+            background-color: #ffeb3b; /* สีพื้นหลังเมื่อ hover */
         }
+
+        .header-bg {
+            background-color: #ffcc00; /* สีทอง */
+        }
+
+        .header-item {
+            color: #ff5733; /* สีส้ม */
+            transition: color 0.3s;
+        }
+
+        .header-item:hover {
+            color: #e65100; /* สีส้มเข้ม */
+        }
+
+        .search-input {
+            background-color: #fff3e0; /* สีพื้นหลังของ input */
+            width: 100%; /* เพิ่มความกว้างของ input */
+        }
+
     </style>
 </head>
 
 <body>
-    <header class="relative w-full bg-white border-b border-gray-300">
+    <header class="relative w-full header-bg border-b border-gray-300">
         <div class="flex items-center justify-between max-w-screen-xl mx-auto px-6 py-4">
             <div class="flex items-center">
                 <img class="w-28 h-auto object-cover" src="{% static 'recipes/img/logo-1.png' %}" alt="Logo">
@@ -34,32 +53,30 @@
             <div class="flex items-center space-x-8 flex-grow">
                 <form class="max-w-md mx-auto relative flex-grow" id="search-form">
                     <label for="default-search" class="sr-only">Search</label>
-                    <div class="relative">
+                    <div>
                         <div class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
                             <svg class="w-4 h-4 text-gray-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 20 20">
                                 <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                     d="m19 19-4-4m0-7A7 7 0 1 1 1 8a7 7 0 0 1 14 0Z" />
                             </svg>
                         </div>
-                        <input type="search" id="default-search" class="block w-full p-4 pl-10 text-sm text-gray-900 border border-gray-300 rounded-lg bg-gray-50 focus:ring-blue-500 focus:border-blue-500"
+                        <input type="search" id="default-search" class="block p-4 pl-10 text-sm text-gray-900 border border-gray-300 rounded-lg search-input focus:ring focus:ring-orange-500 focus:outline-none"
                             placeholder="ค้นหาชื่อเมนู .." required autocomplete="off" onkeyup="fetchSuggestions()" />
-                        <!-- Suggestions dropdown -->
-                        <div id="suggestions" class="absolute bg-white border border-gray-300 mt-1 w-full rounded-lg shadow-lg z-10 hidden"></div>
                     </div>
+                    <!-- Suggestions dropdown -->
+                    <div id="suggestions" class="absolute bg-white border border-gray-300 mt-1 w-full rounded-lg shadow-lg z-10 hidden"></div>
                 </form>
-                <a href="{% url 'home' %}" class="text-gray-700 font-medium hover:text-orange-600 transition">สูตรอาหาร</a>
-                <a href="{% url 'myRecipes' %}" class="text-gray-700 font-medium hover:text-orange-600 transition">สูตรของฉัน</a>
+                <a href="{% url 'home' %}" class="header-item hover:text-orange-600 transition">สูตรอาหาร</a>
+                <a href="{% url 'myRecipes' %}" class="header-item hover:text-orange-600 transition">สูตรของฉัน</a>
                 
                 {% if user.is_authenticated %}
-                    <!-- If user is logged in, show Logout link -->
                     <form action="{% url 'logout' %}" method="post">
                         {% csrf_token %}
-                        <button type="submit" class="text-gray-700 font-medium hover:text-orange-600 transition">ออกจากระบบ</button>
+                        <button type="submit" class="header-item hover:text-orange-600 transition">ออกจากระบบ</button>
                     </form>
                 {% else %}
-                    <!-- If user is not logged in, show Sign Up and Login links -->
-                    <a href="{% url 'signup' %}" class="text-gray-700 font-medium hover:text-orange-600 transition">ลงทะเบียน</a>
-                    <a href="{% url 'login' %}" class="text-gray-700 font-medium hover:text-orange-600 transition">เข้าสู่ระบบ</a>
+                    <a href="{% url 'signup' %}" class="header-item hover:text-orange-600 transition">ลงทะเบียน</a>
+                    <a href="{% url 'login' %}" class="header-item hover:text-orange-600 transition">เข้าสู่ระบบ</a>
                 {% endif %}
             </div>
         </div>

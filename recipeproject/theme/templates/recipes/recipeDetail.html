@@ -26,7 +26,7 @@
             {% for ingredient in ingredients %}
                 <li class="mb-2">
                     <span class="font-medium">{{ ingredient.name }}</span>: 
-                    <span>{{ ingredient.amount }}</span> 
+                    <span>{{ ingredient.amount|floatformat:0 }}</span> 
                     <span>{{ ingredient.unit }}</span>
                 </li>
             {% endfor %}

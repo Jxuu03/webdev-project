@@ -47,7 +47,7 @@ class UserLoginView(LoginView):
 
 def home(request):
     appetizers = Recipe.objects.filter(category="Appetizer")
-    main_dishes = Recipe.objects.filter(category="Main dish")
+    main_dishes = Recipe.objects.filter(category="Main Dish")
     desserts = Recipe.objects.filter(category="Dessert")
     
     appetizer_count = appetizers.count()
@@ -126,14 +126,33 @@ def recipeCreate(request):
 def recipeUpdate(request, pk):
     recipe = get_object_or_404(Recipe, pk=pk)
     if request.method == "POST":
-        recipe_form = RecipeForm(request.POST, instance=recipe)
+        recipe_form = RecipeForm(request.POST, request.FILES, instance=recipe)
         if recipe_form.is_valid():
-            recipe.user = request.user
-            recipe_form.save()
-            return redirect("myRecipes")  # Redirect to the recipe list
+            recipe = recipe_form.save(commit=False)
+            
+            # ใช้ username_id เพื่อค้นหา Member
+            user_instance = get_object_or_404(Member, username_id=request.user.id)
+            recipe.user = user_instance  # กำหนด user เป็น instance ของ Member
+
+            recipe.save()
+
+            # Clear existing ingredients before saving new ones
+            recipe.ingredients.all().delete()
+
+            # Process ingredients if applicable
+            ingredient_names = request.POST.getlist('ingredient')
+            ingredient_amounts = request.POST.getlist('amount')
+            ingredient_units = request.POST.getlist('unit')
+
+            for name, amount, unit in zip(ingredient_names, ingredient_amounts, ingredient_units):
+                if name:
+                    Ingredient.objects.create(recipe=recipe, name=name, amount=amount, unit=unit)
+
+            return redirect("myRecipes")
     else:
         recipe_form = RecipeForm(instance=recipe)
-    return render(request, "recipes/recipe_form.html", {"form": recipe_form})
+
+    return render(request, "recipes/recipe_edit.html", {"form": recipe_form, "recipe": recipe})
 
 # Delete a recipe
 @login_required

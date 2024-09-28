@@ -3,13 +3,13 @@
 {% block main %}
 <div class="max-w-7xl mx-auto p-8">
     <div class="flex justify-between items-center mb-6">
-        <h1 class="text-3xl font-bold">สูตรของฉัน</h1>
-        <a href="{% url 'recipe-create' %}" class="bg-gray-300 text-black px-4 py-2 rounded hover:bg-gray-400">เพิ่มสูตร</a>
+        <h1 class="text-3xl font-bold text-orange-600">สูตรของฉัน</h1>
+        <a href="{% url 'recipe-create' %}" class="bg-orange-500 text-white px-4 py-2 rounded hover:bg-orange-600 transition">เพิ่มสูตร</a>
     </div>
     
     <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
         {% for recipe in recipes %}
-            <div class="bg-gray-100 rounded-lg shadow-lg p-4 transition-transform duration-300 hover:scale-105">
+            <div class="bg-white rounded-lg shadow-lg p-4 transition-transform duration-300 hover:scale-105 hover:shadow-xl">
                 <a href="{% url 'recipe-detail' recipe.pk %}" class="block h-48 bg-gray-200 rounded mb-4">
                     {% if recipe.picture_url %}
                         <img src="{{ recipe.picture_url.url }}" alt="{{ recipe.title }}" class="h-full w-full object-cover rounded">
@@ -18,7 +18,7 @@
                     {% endif %}
                 </a>
                 <div class="flex justify-between items-center">
-                    <p class="text-lg font-semibold">{{ recipe.title }}</p>
+                    <p class="text-lg font-semibold text-gray-800">{{ recipe.title }}</p>
                     <div class="flex space-x-3">
                         <a href="{% url 'recipe-update' recipe.pk %}" class="text-blue-500 hover:text-blue-700">
                             <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">

@@ -1,14 +1,14 @@
 {% extends 'recipes/auth_base.html' %}
 
 {% block main %}
-<section class="flex w-full h-screen items-center justify-center bg-white">
-    <div class="bg-white w-full max-w-md p-8">
+<section class="flex w-full h-screen items-center justify-center bg-pink-100">
+    <div class="bg-white w-full max-w-md p-8 rounded-lg shadow-lg">
         <!-- SIGN IN Header -->
         <div class="text-center mb-8">
-            <p class="text-5xl font-semibold text-black">LOG IN</p>
-            <span class="block text-2xl font-light text-gray-500">Welcome back and let’s cook!</span>
-            <span class="block text-lg font-light text-gray-500">Not a member?
-                <a href="{% url 'signup' %}" class="underline text-blue-500">SIGN UP</a>
+            <p class="text-5xl font-semibold text-orange-500">LOG IN</p>
+            <span class="block text-2xl font-light text-blue-600">Welcome back and let’s cook!</span>
+            <span class="block text-lg font-light text-pink-600">Not a member?
+                <a href="{% url 'signup' %}" class="underline text-yellow-500">SIGN UP</a>
             </span>
         </div>
 
@@ -27,14 +27,14 @@
             <div>
                 <label class="block text-sm text-gray-500">Username</label>
                 <input type="text" name="username"
-                    class="w-full h-14 p-2 border border-gray-400 rounded-lg shadow-sm focus:ring focus:ring-indigo-300"
+                    class="w-full h-14 p-2 border border-gray-400 rounded-lg shadow-sm focus:ring focus:ring-blue-300"
                     required>
             </div>
 
             <div>
                 <label class="block text-sm text-gray-500">Password</label>
                 <input type="password" name="password"
-                    class="w-full h-14 p-2 border border-gray-400 rounded-lg shadow-sm focus:ring focus:ring-indigo-300"
+                    class="w-full h-14 p-2 border border-gray-400 rounded-lg shadow-sm focus:ring focus:ring-pink-300"
                     placeholder="•••••••••" required>
             </div>
 
@@ -47,7 +47,7 @@
 
         <!-- Forgot Password Link -->
         <div class="text-center mt-4">
-            <a href="{% url 'reset-password' %}" class="text-gray-500 text-sm underline">Forgot password?</a>
+            <a href="{% url 'reset-password' %}" class="text-blue-600 text-sm underline">Forgot password?</a>
         </div>
     </div>
 </section>

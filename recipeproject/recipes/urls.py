@@ -29,10 +29,11 @@ urlpatterns = [
     path('my-recipes/', myRecipes, name='myRecipes'),  # URL สำหรับหน้าสูตรของฉัน
     path('recipe/<int:pk>/', recipeDetailView.as_view(), name='recipe-detail'),
     path('recipes/new/', recipeCreate, name='recipe-create'),
-    path('recipes/edit/<int:pk>/', recipeUpdate, name='recipe-update'),
+    path('recipes/edit/<int:pk>/', recipeUpdate, name='recipe-update'),  # URL สำหรับแก้ไขสูตร
     path('recipes/delete/<int:pk>/', recipeDelete, name='recipe-delete'),
     path('search/', views.search_view, name='search_recipes'),
     path('reset-password/', resetPassword, name='reset-password'),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 
+   
    
