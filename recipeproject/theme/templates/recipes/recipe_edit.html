@@ -54,15 +54,15 @@
             <h3 class="text-2xl font-semibold text-gray-700 mb-4">ส่วนผสม</h3>
             <div id="ingredient-fields" class="space-y-4">
                 {% for ingredient in recipe.ingredients.all %}
-                <div class="bg-gray-100 p-4 rounded-lg shadow-md ingredient-form" data-ingredient-id="{{ ingredient.id }}">
-                    <label for="ingredient-{{ forloop.counter }}" class="block text-lg font-medium text-gray-600">ชื่อส่วนผสม</label>
-                    <input type="text" name="ingredient_{{ forloop.counter }}" value="{{ ingredient.name }}" class="w-full p-2 border border-gray-300 rounded-lg shadow-sm focus:ring focus:ring-orange-500 focus:outline-none transition duration-150 ease-in-out" required>
+                <div class="bg-gray-100 p-4 rounded-lg shadow-md ingredient-form">
+                    <label for="ingredient" class="block text-lg font-medium text-gray-600">ชื่อส่วนผสม</label>
+                    <input type="text" name="ingredient" value="{{ ingredient.name }}" class="w-full p-2 border border-gray-300 rounded-lg shadow-sm focus:ring focus:ring-orange-500 focus:outline-none transition duration-150 ease-in-out" required>
 
-                    <label for="amount-{{ forloop.counter }}" class="block text-lg font-medium text-gray-600 mt-4">จำนวน</label>
-                    <input type="number" name="amount_{{ forloop.counter }}" value="{{ ingredient.amount|floatformat:0 }}" class="w-full p-2 border border-gray-300 rounded-lg shadow-sm focus:ring focus:ring-orange-500 focus:outline-none transition duration-150 ease-in-out" required>
+                    <label for="amount" class="block text-lg font-medium text-gray-600 mt-4">จำนวน</label>
+                    <input type="number" name="amount" value="{{ ingredient.amount|floatformat:0 }}" class="w-full p-2 border border-gray-300 rounded-lg shadow-sm focus:ring focus:ring-orange-500 focus:outline-none transition duration-150 ease-in-out" required>
 
-                    <label for="unit-{{ forloop.counter }}" class="block text-lg font-medium text-gray-600 mt-4">หน่วย</label>
-                    <select name="unit_{{ forloop.counter }}" class="w-full p-2 border border-gray-300 rounded-lg focus:ring focus:ring-orange-500 focus:outline-none">
+                    <label for="unit" class="block text-lg font-medium text-gray-600 mt-4">หน่วย</label>
+                    <select name="unit" class="w-full p-2 border border-gray-300 rounded-lg focus:ring focus:ring-orange-500 focus:outline-none">
                         <option value="กรัม" {% if ingredient.unit == "กรัม" %}selected{% endif %}>กรัม</option>
                         <option value="กิโลกรัม" {% if ingredient.unit == "กิโลกรัม" %}selected{% endif %}>กิโลกรัม</option>
                         <option value="ถ้วย" {% if ingredient.unit == "ถ้วย" %}selected{% endif %}>ถ้วย</option>
@@ -80,7 +80,7 @@
                         <option value="ซอง" {% if ingredient.unit == "ซอง" %}selected{% endif %}>ซอง</option>
                     </select>
 
-                    <button type="button" class="mt-4 px-3 py-2 bg-red-500 text-white rounded-lg shadow hover:bg-red-600 transition duration-150 ease-in-out delete-ingredient" data-id="{{ ingredient.id }}">ลบส่วนผสม</button>
+                    <button type="button" class="mt-4 px-3 py-2 bg-red-500 text-white rounded-lg shadow hover:bg-red-600 transition duration-150 ease-in-out delete-ingredient">ลบส่วนผสม</button>
                 </div>
                 {% endfor %}
             </div>
@@ -99,25 +99,23 @@
             <button type="submit" class="bg-green-500 text-white px-6 py-3 rounded-lg shadow hover:bg-green-600 transition duration-150 ease-in-out">บันทึกการแก้ไขสูตรอาหาร</button>
         </div>
     </form>
-
 </div>
 
 <!-- JavaScript to dynamically add and remove ingredient fields -->
 <script>
     document.getElementById('add-ingredient').addEventListener('click', function() {
         const ingredientFields = document.getElementById('ingredient-fields');
-        const newIndex = document.querySelectorAll('.ingredient-form').length + 1; // Find new index based on number of forms
         const newIngredient = document.createElement('div');
         newIngredient.className = 'bg-gray-100 p-4 rounded-lg shadow-md ingredient-form';
         newIngredient.innerHTML = `
-            <label for="ingredient-${newIndex}" class="block text-lg font-medium text-gray-600">ชื่อส่วนผสม</label>
-            <input type="text" name="ingredient_${newIndex}" class="w-full p-2 border border-gray-300 rounded-lg shadow-sm focus:ring focus:ring-orange-500 focus:outline-none" required>
+            <label for="ingredient" class="block text-lg font-medium text-gray-600">ชื่อส่วนผสม</label>
+            <input type="text" name="ingredient" class="w-full p-2 border border-gray-300 rounded-lg shadow-sm focus:ring focus:ring-orange-500 focus:outline-none" required>
 
-            <label for="amount-${newIndex}" class="block text-lg font-medium text-gray-600 mt-4">จำนวน</label>
-            <input type="number" name="amount_${newIndex}" class="w-full p-2 border border-gray-300 rounded-lg shadow-sm focus:ring focus:ring-orange-500 focus:outline-none" required>
+            <label for="amount" class="block text-lg font-medium text-gray-600 mt-4">จำนวน</label>
+            <input type="number" name="amount" class="w-full p-2 border border-gray-300 rounded-lg shadow-sm focus:ring focus:ring-orange-500 focus:outline-none" required>
 
-            <label for="unit-${newIndex}" class="block text-lg font-medium text-gray-600 mt-4">หน่วย</label>
-            <select name="unit_${newIndex}" class="w-full p-2 border border-gray-300 rounded-lg focus:ring focus:ring-orange-500 focus:outline-none">
+            <label for="unit" class="block text-lg font-medium text-gray-600 mt-4">หน่วย</label>
+            <select name="unit" class="w-full p-2 border border-gray-300 rounded-lg focus:ring focus:ring-orange-500 focus:outline-none">
                 <option value="กรัม">กรัม</option>
                 <option value="กิโลกรัม">กิโลกรัม</option>
                 <option value="ถ้วย">ถ้วย</option>
@@ -145,7 +143,7 @@
         });
     });
 
-    // Add delete functionality to existing ingredients
+    // Delete existing ingredient functionality
     document.querySelectorAll('.delete-ingredient').forEach(button => {
         button.addEventListener('click', function() {
             const ingredientForm = this.closest('.ingredient-form');
@@ -155,4 +153,3 @@
 </script>
 
 {% endblock %}
-
