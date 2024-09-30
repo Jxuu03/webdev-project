@@ -803,10 +803,6 @@ select {
   position: static;
 }
 
-.fixed {
-  position: fixed;
-}
-
 .absolute {
   position: absolute;
 }
@@ -920,10 +916,6 @@ select {
 
 .mt-8 {
   margin-top: 2rem;
-}
-
-.mt-40 {
-  margin-top: 10rem;
 }
 
 .block {
@@ -1046,10 +1038,6 @@ select {
   width: 100%;
 }
 
-.w-64 {
-  width: 16rem;
-}
-
 .max-w-2xl {
   max-width: 42rem;
 }
@@ -1072,10 +1060,6 @@ select {
 
 .max-w-screen-xl {
   max-width: 1280px;
-}
-
-.flex-shrink-0 {
-  flex-shrink: 0;
 }
 
 .flex-grow {
@@ -1102,10 +1086,6 @@ select {
 
 .cursor-pointer {
   cursor: pointer;
-}
-
-.touch-none {
-  touch-action: none;
 }
 
 .touch-pan-x {
@@ -1135,10 +1115,6 @@ select {
 
 .flex-col {
   flex-direction: column;
-}
-
-.flex-nowrap {
-  flex-wrap: nowrap;
 }
 
 .items-center {
@@ -1758,10 +1734,6 @@ select {
 
   .md\:w-1\/2 {
     width: 50%;
-  }
-
-  .md\:w-3\/4 {
-    width: 75%;
   }
 
   .md\:grid-cols-3 {

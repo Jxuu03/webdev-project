@@ -24,12 +24,19 @@ class UserRegisterForm(UserCreationForm):
         return cleaned_data
     
 ## -- RecipeForm -- ##
+from django import forms
+from django.forms import modelformset_factory
+from .models import Recipe, Ingredient
+
 class RecipeForm(forms.ModelForm):
     class Meta:
         model = Recipe
         fields = ['title', 'category', 'difficulty', 'picture_url', 'instructions']
 
-class IngredientForm(forms.ModelForm):
-    class Meta:
-        model = Ingredient
-        fields = '__all__'
+# Form สำหรับการจัดการ Ingredients
+IngredientFormSet = modelformset_factory(
+    Ingredient,
+    fields=('name', 'amount', 'unit'),
+    extra=1,  # สามารถกำหนดจำนวนฟอร์มใหม่ที่ต้องการเพิ่มได้
+    can_delete=True  # อนุญาตให้ลบ ingredients
+)

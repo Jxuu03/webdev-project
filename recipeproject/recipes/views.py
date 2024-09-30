@@ -15,6 +15,9 @@ from django.http import JsonResponse
 from django.urls import reverse
 from django.core.mail import send_mail
 from django.utils.crypto import get_random_string
+from .models import Recipe, Ingredient
+from .forms import RecipeForm, IngredientFormSet
+
 
 ## -- Authen -- ##
 class SignUpView(CreateView):
@@ -125,35 +128,37 @@ def recipeCreate(request):
 @login_required
 def recipeUpdate(request, pk):
     recipe = get_object_or_404(Recipe, pk=pk)
+    
+    # สร้างฟอร์ม Recipe และ IngredientFormSet
     if request.method == "POST":
         recipe_form = RecipeForm(request.POST, request.FILES, instance=recipe)
-        if recipe_form.is_valid():
-            recipe = recipe_form.save(commit=False)
-            
-            # ใช้ username_id เพื่อค้นหา Member
-            user_instance = get_object_or_404(Member, username_id=request.user.id)
-            recipe.user = user_instance  # กำหนด user เป็น instance ของ Member
+        formset = IngredientFormSet(request.POST, queryset=recipe.ingredients.all())
 
+        if recipe_form.is_valid() and formset.is_valid():
+            recipe = recipe_form.save(commit=False)
+            recipe.user = request.user  # เชื่อมโยงกับผู้ใช้ที่กำลังล็อกอิน
             recipe.save()
 
-            # Clear existing ingredients before saving new ones
-            recipe.ingredients.all().delete()
+            # บันทึกส่วนผสมจาก formset
+            ingredients = formset.save(commit=False)
+            for ingredient in ingredients:
+                ingredient.recipe = recipe
+                ingredient.save()
 
-            # Process ingredients if applicable
-            ingredient_names = request.POST.getlist('ingredient')
-            ingredient_amounts = request.POST.getlist('amount')
-            ingredient_units = request.POST.getlist('unit')
-
-            for name, amount, unit in zip(ingredient_names, ingredient_amounts, ingredient_units):
-                if name:
-                    Ingredient.objects.create(recipe=recipe, name=name, amount=amount, unit=unit)
+            # ลบส่วนผสมที่ทำเครื่องหมายว่าลบ
+            for obj in formset.deleted_objects:
+                obj.delete()
 
             return redirect("myRecipes")
     else:
         recipe_form = RecipeForm(instance=recipe)
+        formset = IngredientFormSet(queryset=recipe.ingredients.all())
 
-    return render(request, "recipes/recipe_edit.html", {"form": recipe_form, "recipe": recipe})
-
+    return render(request, "recipes/recipe_edit.html", {
+        "form": recipe_form,
+        "formset": formset,
+        "recipe": recipe
+    })
 # Delete a recipe
 @login_required
 def recipeDelete(request, pk):
